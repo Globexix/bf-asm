@@ -30,6 +30,12 @@ _start:
     cmp al, '-'
     je .decrement
 
+    cmp al, '>'
+    je .inc_pointer
+
+    cmp al, '<'
+    je .dec_pointer
+
     inc rsi
     jmp .interpreter_loop
 
@@ -53,4 +59,14 @@ _start:
 .decrement:
     inc rsi
     dec byte ptr [rdi]
+    jmp .interpreter_loop
+
+.inc_pointer:
+    inc rsi
+    inc rdi
+    jmp .interpreter_loop
+
+.dec_pointer:
+    inc rsi
+    dec rdi 
     jmp .interpreter_loop
