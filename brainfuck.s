@@ -1,20 +1,44 @@
 .intel_syntax noprefix
 .global _start
 
-.section .rodata
-    # Hello World!
-    code: .ascii "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
-    .byte 0
-
 .section .bss
     buffer: .skip 30000
+    code_buf: .skip 65536
 
 .section .text
 _start: 
-    # code pointer
-    # load adress of 'code' into rsi
-    lea rsi, [code]
+    # check argc >= 2
+    mov rax, [rsp]
+    cmp rax, 2
+    jl .exit_error
 
+    # sys open
+    mov rdi, [rsp + 16]
+    mov rax, 2
+    xor rsi, rsi
+    xor rdx, rdx
+    syscall
+
+    cmp rax, 0
+    jl .exit_error
+    # save fd
+    mov r8, rax
+
+    # sys read
+    mov rdi, r8 # fd
+    mov rax, 0
+    lea rsi, [code_buf]
+    mov rdx, 65536
+    syscall
+
+    # sys close
+    mov rdi, r8 # fd
+    mov rax, 3
+    syscall
+
+
+    # code pointer
+    lea rsi, [code_buf]
     # value pointer
     lea rdi, [buffer]
 
@@ -54,6 +78,11 @@ _start:
 .exit:
     mov rax, 60
     xor rdi, rdi
+    syscall
+
+.exit_error:
+    mov rax, 60
+    mov rdi, 1
     syscall
 
 .increment:
