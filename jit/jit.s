@@ -79,6 +79,12 @@ _start:
     cmp al, '.'
     je .print_value
 
+    cmp al, '['
+    je .jump_forward
+
+    cmp al, ']'
+    je .jump_back
+
     inc rsi
     jmp .interpreter_loop
 
@@ -140,3 +146,52 @@ _start:
     
     inc rsi
     jmp .interpreter_loop
+
+.jump_forward:
+    # 80 3f 00 0f 84 00 00 00 00
+
+    # 80 3f 00 0f
+    mov dword ptr [r12], 0x0f003f80
+    # 84 00 00 00
+    mov dword ptr[r12 + 4], 0x00000084
+    # 00
+    mov byte ptr [r12 + 8], 0x00
+
+    add r12, 9
+
+    # push end of '[' to stack
+    push r12
+
+    inc rsi
+    jmp .interpreter_loop
+
+.jump_back:
+    # pop end of '[' into r8
+    pop r8
+    
+    # 80 3f 00 0f 85
+    mov dword ptr [r12], 0x0f003f80
+    mov byte ptr[r12 + 4], 0x85
+
+    # end of current ']' instruction
+    lea r9, [r12 + 9]
+
+    # offset = dest - source end
+    # target is r9 (end of ']'), source is r8 (end of '[')
+    mov rax, r9
+    sub rax, r8
+
+    # patch '[' offset (4 bytes before its end)
+    mov dword ptr[r8 - 4], eax
+
+    # jump back offset
+    neg eax
+
+    # write offset into current ']' (starts at r12 + 5)
+    mov dword ptr[r12 + 5], eax
+
+    add r12, 9
+
+    inc rsi
+    jmp .interpreter_loop
+

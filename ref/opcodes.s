@@ -22,3 +22,7 @@ pop rdi
 pop rsi
 
 ret
+
+cmp byte ptr [rdi], 0
+jz 0
+jnz 0
