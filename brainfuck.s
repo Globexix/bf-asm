@@ -27,6 +27,9 @@ _start:
     cmp al, '+'
     je .increment
 
+    cmp al, '-'
+    je .decrement
+
     inc rsi
     jmp .interpreter_loop
 
@@ -45,4 +48,9 @@ _start:
 .increment:
     inc rsi
     inc byte ptr [rdi]
+    jmp .interpreter_loop
+
+.decrement:
+    inc rsi
+    dec byte ptr [rdi]
     jmp .interpreter_loop
