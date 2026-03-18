@@ -1,18 +1,34 @@
 # bf-asm
 
-A brainfuck interpreter written in x86-64 assembly (Linux).
+A brainfuck interpreter, JIT compiler, and AOT compiler written in x86-64 assembly (Linux).
 
 ## Usage
 
 ```bash
-./brainfuck program.bf
+# Interpreter
+./main -i program.bf
+
+# JIT compiler
+./main -j program.bf
+
+# AOT compiler (emits a standalone ELF binary)
+./main -a program.bf        # outputs a.out
+./main -a program.bf output # outputs to custom file
 ```
 
 ## Building
 
 ```bash
-as --64 -o brainfuck.o brainfuck.s && ld -o brainfuck brainfuck.o
+make
 ```
+
+## Execution modes
+
+| Flag | Mode | Description |
+|---|---|---|
+| `-i` | Interpreter | Executes brainfuck directly |
+| `-j` | JIT | Compiles to x86-64 and runs immediately |
+| `-a` | AOT | Emits a standalone ELF64 executable |
 
 ## Supported instructions
 
