@@ -1,3 +1,4 @@
 *.o
 brainfuck
 brainfuck_jit
+main
